@@ -110,59 +110,31 @@ def get_battery_compact():
     return f"{battery_indicator}"
 
 
-def get_battery_quarter():
-    """Display battery percentage in a compact format"""
+def get_battery_simple():
+    """Display battery percentage using high, medium, low level icons"""
 
     # Battery icons in Unicode which are available in NerdFonts
-    # Note that the icons for battery levels in charging is irregular.
+    icon_charging = [
+        0x000F089F,  #   0%
+        0x000F12A4,  #  33%
+        0x000F12A5,  #  66%
+        0x000F12A6,  # 100%
+    ]
+    icon_discharging = [
+        0x000F0082,  #   0%
+        0x000F12A1,  #  33%
+        0x000F12A2,  #  66%
+        0x000F12A3,  # 100%
+    ]
 
-    # Level    Discharging    Charging
-    # -----    -----------    --------
-    #   0%       000F008e     000F089F
-    #  10%       000F007A     000F089C
-    #  20%       000F007B     000F0086
-    #  30%       000F007C     000F0087
-    #  40%       000F007D     000F0088
-    #  50%       000F007E     000F089D
-    #  60%       000F007F     000F0089
-    #  70%       000F0080     000F089E
-    #  80%       000F0081     000F008A
-    #  90%       000F0082     000F008B
-    # 100%       000F0079     000F0085
-
-    level = psutil.sensors_battery().percent // 10
+    battery_percentage = psutil.sensors_battery().percent
+    level = battery_percentage // 3
 
     # Unicode characters for the battery indicator
     if _get_charging_status():
-        if level == 0:
-            battery_indicator = chr(0x000F089F)
-        elif level == 1:
-            battery_indicator = chr(0x000F089C)
-        elif level == 2:
-            battery_indicator = chr(0x000F0086)
-        elif level == 3:
-            battery_indicator = chr(0x000F0087)
-        elif level == 4:
-            battery_indicator = chr(0x000F0088)
-        elif level == 5:
-            battery_indicator = chr(0x000F089D)
-        elif level == 6:
-            battery_indicator = chr(0x000F0089)
-        elif level == 7:
-            battery_indicator = chr(0x000F089E)
-        elif level == 8:
-            battery_indicator = chr(0x000F008A)
-        elif level == 9:
-            battery_indicator = chr(0x000F008B)
-        else:
-            battery_indicator = chr(0x000F0085)
+        battery_indicator = chr(icon_charging[level])
     else: # Discharging
-        if level == 0:
-            battery_indicator = chr(0x000F008e)
-        elif level == 10:
-            battery_indicator = chr(0x000F0079)
-        else:
-            battery_indicator = chr(0x000F0079 + level)
+        battery_indicator = chr(icon_discharging[level])
 
     return f"{battery_indicator}"
 
@@ -178,8 +150,8 @@ def main(args):
         battery = get_battery_long(mode="humor")
     elif args.compact:
         battery = get_battery_compact()
-    elif args.quarter:
-        battery = get_battery_quarter()
+    elif args.simple:
+        battery = get_battery_simple()
     else:
         battery = get_battery_percent()
 
@@ -227,11 +199,11 @@ if __name__ == "__main__":
         help="display remaining battery as an icon",
     )
     parser.add_argument(
-        "-q",
-        "--quarter",
+        "-s",
+        "--simple",
         action="store_true",
         default=False,
-        help="display remaining battery as a quarter-level icon",
+        help="display remaining battery as a high, medium, low icon",
     )
     args = parser.parse_args()
     main(args)
