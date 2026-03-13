@@ -71,6 +71,50 @@ def get_battery_compact():
     # Battery icons in Unicode which are available in NerdFonts
     # Note that the icons for battery levels in charging is irregular.
 
+    icon_discharging = [
+        0x000F008E,  #   0%
+        0x000F007A,  #  10%
+        0x000F007B,  #  20%
+        0x000F007C,  #  30%
+        0x000F007D,  #  40%
+        0x000F007E,  #  50%
+        0x000F007F,  #  60%
+        0x000F0080,  #  70%
+        0x000F0081,  #  80%
+        0x000F0082,  #  90%
+        0x000F0079,  # 100%
+    ]
+    icon_charging = [
+        0x000F089F,  #   0%
+        0x000F089C,  #  10%
+        0x000F0086,  #  20%
+        0x000F0087,  #  30%
+        0x000F0088,  #  40%
+        0x000F089D,  #  50%
+        0x000F0089,  #  60%
+        0x000F089E,  #  70%
+        0x000F008A,  #  80%
+        0x000F008B,  #  90%
+        0x000F0085,  # 100%
+    ]
+
+    level = psutil.sensors_battery().percent // 10
+
+    # Unicode characters for the battery indicator
+    if _get_charging_status():
+        battery_indicator = chr(icon_charging[level])
+    else: # Discharging
+        battery_indicator = chr(icon_discharging[level])
+
+    return f"{battery_indicator}"
+
+
+def get_battery_quarter():
+    """Display battery percentage in a compact format"""
+
+    # Battery icons in Unicode which are available in NerdFonts
+    # Note that the icons for battery levels in charging is irregular.
+
     # Level    Discharging    Charging
     # -----    -----------    --------
     #   0%       000F008e     000F089F
@@ -133,6 +177,8 @@ def main(args):
         battery = get_battery_long(mode="humor")
     elif args.compact:
         battery = get_battery_compact()
+    elif args.quarter:
+        battery = get_battery_quarter()
     else:
         battery = get_battery_percent()
 
@@ -172,13 +218,19 @@ if __name__ == "__main__":
         default=False,
         help="display remaining battery with humor",
     )
-
     parser.add_argument(
         "-c",
         "--compact",
         action="store_true",
         default=False,
         help="display remaining battery as an icon",
+    )
+    parser.add_argument(
+        "-q",
+        "--quarter",
+        action="store_true",
+        default=False,
+        help="display remaining battery as a quarter-level icon",
     )
     args = parser.parse_args()
     main(args)
