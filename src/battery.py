@@ -107,7 +107,7 @@ def get_battery_compact():
     else: # Discharging
         battery_indicator = chr(icon_discharging[level])
 
-    return f"{battery_indicator}{battery_percentage}%"
+    return f"{battery_indicator}"
 
 
 def get_battery_quarter():
