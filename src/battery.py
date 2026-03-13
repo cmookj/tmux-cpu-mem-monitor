@@ -98,7 +98,8 @@ def get_battery_compact():
         0x000F0085,  # 100%
     ]
 
-    level = psutil.sensors_battery().percent // 10
+    battery_percentage = psutil.sensors_battery().percent
+    level = battery_percentage // 10
 
     # Unicode characters for the battery indicator
     if _get_charging_status():
@@ -106,7 +107,7 @@ def get_battery_compact():
     else: # Discharging
         battery_indicator = chr(icon_discharging[level])
 
-    return f"{battery_indicator}"
+    return f"{battery_indicator}{battery_percentage}%"
 
 
 def get_battery_quarter():
