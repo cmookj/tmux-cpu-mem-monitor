@@ -61,20 +61,35 @@ def get_battery_long():
 
 
 def _remap_range(value, low, high, remap_low, remap_high):
-    """Remap the battery percentage into a whole number from 0 up to 7"""
+    """Remap the battery percentage into a whole number from remap_low up to remap_high"""
     return remap_low + (value - low) * (remap_high - remap_low) // (high - low)
 
 
 def get_battery_compact():
     """Display battery percentage in a compact format"""
     if _get_charging_status():
-        return chr(0x00002593)
+        return chr(0x000F0084)
 
-    battery = _remap_range(psutil.sensors_battery().percent, 0, 100, 0, 7)
+    level = psutil.sensors_battery().percent // 10
+    #   0% - 000F008e
+    #  10% - 000F007A
+    #  20% - 000F007B
+    #  30% - 000F007C
+    #  40% - 000F007D
+    #  50% - 000F007E
+    #  60% - 000F007F
+    #  70% - 000F0080
+    #  80% - 000F0081
+    #  90% - 000F0082
+    # 100% - 000F0079
 
     # Unicode characters for the battery indicator
-    # 0x00002581-0x00002588
-    battery_indicator = chr(0x00002581 + int(battery))
+    if level == 0:
+        battery_indicator = chr(0x000F008e)
+    elif level == 10:
+        battery_indicator = chr(0x000F0079)
+    else:
+        battery_indicator = chr(0x000F0079 + level)
 
     return f"{battery_indicator}"
 
