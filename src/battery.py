@@ -128,7 +128,7 @@ def get_battery_simple():
     ]
 
     battery_percentage = psutil.sensors_battery().percent
-    level = battery_percentage // 3
+    level = battery_percentage // 33
 
     # Unicode characters for the battery indicator
     if _get_charging_status():
